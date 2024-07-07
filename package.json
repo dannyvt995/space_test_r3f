@@ -1,0 +1,22 @@
+{
+  "name": "test_car_effect",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.108.1",
+    "@react-three/fiber": "^8.16.8",
+    "@react-three/postprocessing": "^2.16.2",
+    "leva": "^0.9.35",
+    "next": "14.2.4",
+    "r3f-perf": "^7.2.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "three": "^0.166.1"
+  }
+}
