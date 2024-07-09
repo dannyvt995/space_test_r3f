@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 import { Canvas, useThree, extend, useFrame } from "@react-three/fiber";
 import * as THREE from 'three'
 import { Perf } from "r3f-perf";
-import { OrbitControls, Stats} from "@react-three/drei";
+import { OrbitControls, Stats , MeshReflectorMaterial} from "@react-three/drei";
 import TestCar from "./TestCar";
 import {Bloom,EffectComposer, DepthOfField, Vignette, Outline, wrapEffect } from '@react-three/postprocessing'
 import { NoiseEffect } from 'postprocessing'
@@ -48,7 +48,7 @@ export default function Home() {
         }}
         camera={{ near: 0.1, far: 1000, position: [2, .7, 3.5], target: [0, 0, 0] }}>
 
-        <OrbitControls enablePan={true} minPolarAngle={Math.PI / 2.7} /*  maxPolarAngle={Math.PI / -2.7} */ />
+        <OrbitControls enablePan={true} /* minPolarAngle={Math.PI / 3.2}  maxPolarAngle={Math.PI / 1} */ />
         <Perf />
         <Stats />
         <TestCar />
@@ -58,8 +58,8 @@ export default function Home() {
           <meshBasicMaterial color={"red"}/>
         </mesh> */}
 
-        <color attach="background" args={["#050505"]} />{/* 050505 */}
-        {/* <fog color={0x050505} attach="fog" near={1} far={5} /> */}
+        <color attach="background" args={["black"]} />{/* 050505 */}
+       {/*  <fog color={"white"} attach="fog" near={1} far={5} /> */}
         {/*  <Environment preset="night" /> */}
        {/*   <axesHelper args={[5, 5, 5]} /> */}
 
@@ -67,7 +67,9 @@ export default function Home() {
         {/* <ContactShadows resolution={1024} frames={1} position={[0, -1.16, 0]} scale={15} blur={0.5} opacity={1} far={20} /> */}
         {/*  <EnvironmentCustom/> */}
         {/* <Environment preset="night" /> */}
-         {/*  <EffectComposerR3f/> */}
+      {/*   <GroundMinor/> */}
+       {/*   
+          <EffectComposerR3f/> */}
        <CustomEffectComposer/>
     
       </Canvas>
@@ -125,7 +127,7 @@ function EffectComposerR3f() {
         
         <Bloom intensity={.5} luminanceThreshold={0} luminanceSmoothing={0.1} height={300} />
         <Noise opacity={0.01} intensity={5}/>
-       <GroundMinor/>
+     
       </EffectComposer>
     </>
 

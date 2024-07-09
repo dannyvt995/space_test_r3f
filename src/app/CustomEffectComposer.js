@@ -132,7 +132,8 @@ export default function CustomEffectComposer() {
       
    
       meshRef.current = new THREE.Mesh(
-        new THREE.PlaneGeometry(7, 4),
+     new THREE.PlaneGeometry(7, 4),
+       
         new THREE.ShaderMaterial({
           side: 2,
           uniforms: {
@@ -189,23 +190,27 @@ export default function CustomEffectComposer() {
 
     useEffect(() => {
               
-      mirrorGeometry.current = new THREE.PlaneGeometry( 10, 10 );
+    //  mirrorGeometry.current = new THREE.PlaneGeometry( 10, 10,200,200 );
+      mirrorGeometry.current =  new THREE.RingGeometry( 0, 20, 200,200 ); 
       mirror.current = new Reflector( mirrorGeometry.current, {
         clipBias: 0.01,
-        textureWidth: window.innerWidth * .25,
-        textureHeight: window.innerHeight  * .25,
+        textureWidth: window.innerWidth * .72,
+        textureHeight: window.innerHeight  * .72,
         color: 0x777777,
-        opacity: 0.2
+        
         } ,composer.current);
-
-        mirror.current.position.y = -.1
+   
+        mirror.current.position.y = .01
         mirror.current.rotateX(  - Math.PI / 2 );
-     
+  
         scene.add(mirror.current)
     },[scene])
-    useFrame(() => {
+    useFrame((state) => {
       if (composer.current) {
-
+        if(mirror.current){
+         mirror.current.material.uniforms.uTime.value = state.clock.getElapsedTime()
+     
+        }
       composer.current.render();
     
    meshRef.current.material.uniforms.uComposer.value = composer.current.renderTarget1.textures[0] 

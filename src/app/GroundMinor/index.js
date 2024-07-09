@@ -7,7 +7,9 @@ export default function GroundMinor() {
     return (
 
         <>
-            <ambientLight intensity={1} color={0xfffff} />
+
+        
+            <ambientLight intensity={1} color={0xffffff} />
             <group position={[0., -.1, 0]}>
                 <mesh rotation={[-Math.PI / 2, 0, Math.PI / 2]} ref={meshRef}>
                     <circleGeometry args={[8, 32]} />
@@ -16,6 +18,9 @@ export default function GroundMinor() {
                         mirror={1}
                     />
                 </mesh>
+
+
+           
             </group>
         </>
 

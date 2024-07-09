@@ -35,6 +35,7 @@ class Reflector extends Mesh {
 		//
 
 		const reflectorPlane = new Plane();
+	
 		const normal = new Vector3();
 		const reflectorWorldPosition = new Vector3();
 		const cameraWorldPosition = new Vector3();
@@ -55,12 +56,14 @@ class Reflector extends Mesh {
 			name: ( shader.name !== undefined ) ? shader.name : 'unspecified',
 			uniforms: UniformsUtils.clone( shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader
+			vertexShader: shader.vertexShader,
+			//wireframe:true
 		} );
 
 		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 		material.uniforms[ 'color' ].value = color;
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
+		material.uniforms[ 'uTime' ].value = 0.;
 
 		this.material = material;
 
@@ -208,6 +211,11 @@ Reflector.ReflectorShader = {
 
 		'textureMatrix': {
 			value: null
+		},
+
+		
+		'uTime': {
+			value: 0
 		}
 
 	},
@@ -215,15 +223,22 @@ Reflector.ReflectorShader = {
 	vertexShader: /* glsl */`
 		uniform mat4 textureMatrix;
 		varying vec4 vUv;
+		uniform float uTime;
 
+		float random(vec2 p) {
+			return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+		  }
+		  
 		#include <common>
 		#include <logdepthbuf_pars_vertex>
 
 		void main() {
+			vec3 pos = position;
+			pos.z += sin(pos.x *10.+ uTime) * .01 ;
+			pos.z -= cos(pos.y *10.+ uTime) * .01 ;
+			vUv = textureMatrix * vec4( pos, 1.0 );
 
-			vUv = textureMatrix * vec4( position, 1.0 );
-
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
 
 			#include <logdepthbuf_vertex>
 
@@ -233,7 +248,8 @@ Reflector.ReflectorShader = {
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 		varying vec4 vUv;
-
+		uniform float uTime;
+		
 		#include <logdepthbuf_pars_fragment>
 
 		float blendOverlay( float base, float blend ) {
@@ -248,12 +264,25 @@ Reflector.ReflectorShader = {
 
 		}
 
+		float random(vec2 p) {
+			return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+		}
 		void main() {
 
 			#include <logdepthbuf_fragment>
 
+			vec4 uvc = vUv;
+			uvc.x -= sin(uvc.y * 2.) * .2;
+			uvc.y += cos(uvc.x * 2.) * .2;
 			vec4 base = texture2DProj( tDiffuse, vUv );
-			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+
+			vec3 rlsMinor =  blendOverlay( base.rgb, color );
+		
+		
+
+			gl_FragColor = vec4( rlsMinor , 1.0 );
+			//gl_FragColor = vec4( vec3(.4,.5,1.), 1.0 );
 
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>

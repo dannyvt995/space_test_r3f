@@ -49,10 +49,12 @@ export default function TestCar() {
 
   const { scene: scene1New } = useGLTF("BUGATI_V2_F1.glb");
   const { nodes } = useGLTF("/day58_aluminium_bracket-transformed.glb")
+  const {  scene: scene2New  } = useGLTF("/Tugboat.glb")
+
   const matCar = useRef(null)
+  
 
-
-  const meshCar = scene1New.children[0].geometry;
+  const meshCar = scene2New.children[0].geometry;
 
   //meshCar.center()
   meshCar.renderOrder = 1
@@ -66,7 +68,7 @@ export default function TestCar() {
 
 
   const meshWireCar = scene1New.children[5].geometry
-  const [hovered, hover] = useState(false)
+
 
   //meshWireCar.center()
   meshWireCar.renderOrder = 2
@@ -81,7 +83,7 @@ export default function TestCar() {
     color: 0x00000,
     //flatShading:true,
     envMap: maptexture,
-    envMapIntensity: 2.,
+    envMapIntensity: 5.,
     //envMapRotation: new Euler( 0,-2.0,0, 'XYZ' ),
     //envMapRotation: new Euler( 0,1.0,0, 'XYZ' ),//env_f3_3
     metalness: 1,
@@ -108,17 +110,17 @@ export default function TestCar() {
 
       <group scale={0.42} visible={true} name="Carne">
         <mesh geometry={meshCar} material={matCar.current} >
-          <Edges linewidth={3} threshold={20} color={0xfffff} />
+          <Edges linewidth={2} threshold={15} color={0xd9d9d9} />
           {/*   <Outlines thickness={0.01} opacity={.1} color={0xfffff} />  */}
 
         </mesh>
       </group>
-      <group position={[1.07, .35, 1.08]} scale={[.2 * 0.07, 1 * 0.07, .1 * 0.07]} visible={true}>
+     {/*  <group position={[1.07, .35, 1.08]} scale={[.2 * 0.07, 1 * 0.07, .1 * 0.07]} visible={true}>
         <BanhXe groupBanhXe={ListBanhXe[0]} />
       </group>
       <group position={[1.1, .35, -2.2]} scale={[.2 * 0.07, 1 * 0.07, .1 * 0.07]}  >
         <BanhXe groupBanhXe={ListBanhXe[1]} />
-      </group>
+      </group> */}
       {/*   <group visible={false}>
         <mesh>
           <sphereGeometry args={[5, 16, 32]} />
