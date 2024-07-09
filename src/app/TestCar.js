@@ -1,41 +1,54 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from 'three'
-import { useGLTF, useTexture, Reflector, useCubeTexture, MeshReflectorMaterial } from "@react-three/drei";
-import { Group, MeshStandardMaterial, Euler, MeshBasicMaterial, TextureLoader, EquirectangularReflectionMapping, Mesh } from "three";
-import { useFrame } from "@react-three/fiber";
-
+import { useGLTF, useTexture, Reflector, useCubeTexture, Outlines, Edges } from "@react-three/drei";
+import { Group, MeshStandardMaterial, MeshBasicMaterial, TextureLoader, EquirectangularReflectionMapping, Mesh } from "three";
+import { useFrame, useThree, useLoader } from "@react-three/fiber";
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { Outline } from '@react-three/postprocessing'
 import { BlendFunction, Resizer, KernelSize } from 'postprocessing'
 import GroundMinor from "./GroundMinor";
 
 
 const materialsbANHxE = [
-  new MeshBasicMaterial({ color: 0xfffff, side: 1, wireframe: false, transparent: true, opacity: 0.5 }),
+  new MeshBasicMaterial({ color: 0x00000, side: 1, wireframe: false, transparent: true, opacity: 0.5 }),
   new MeshBasicMaterial({ color: 0x00000, side: 1, wireframe: false, transparent: true, opacity: .1 }),
   new MeshBasicMaterial({ color: 0xd1982e, side: 1, wireframe: true, transparent: true, opacity: 0.35 }),
-  new MeshBasicMaterial({ color: 'white', side: 1, wireframe: true, transparent: true, opacity: 0.5 }),
-  new MeshBasicMaterial({ color: 'green', side: 1, wireframe: true, transparent: true, opacity: 0.5 }),
-  new MeshBasicMaterial({ color: 'pink', side: 1, wireframe: true, transparent: true, opacity: 0.5 }),
-  new MeshBasicMaterial({ color: 'yellow', side: 1, wireframe: true, transparent: true, opacity: 0.5 }),
+  new MeshBasicMaterial({ color: 'white', side: 1, wireframe: false, transparent: true, opacity: 0.5 }),
+  new MeshBasicMaterial({ color: 'green', side: 1, wireframe: false, transparent: true, opacity: 0.5 }),
+  new MeshBasicMaterial({ color: 'pink', side: 1, wireframe: false, transparent: true, opacity: 0.5 }),
+  new MeshBasicMaterial({ color: 'yellow', side: 1, wireframe: false, transparent: true, opacity: 0.5 }),
 ];
 
 const BanhXe = ({ groupBanhXe }) => {
-  console.log(groupBanhXe)
+
   if (groupBanhXe) {
     return (
       <group>
-        {groupBanhXe.children.slice(1, 4).map((child, index) => (
-          <mesh key={index} geometry={child.geometry} material={materialsbANHxE[index]} />
-        ))}
+        {groupBanhXe.children.slice(1, 4).map((child, index) => {
+          if(index === 4) {
+            return(
+              <mesh key={index} geometry={child.geometry} material={materialsbANHxE[index]} />
+            )
+          }
+          else{
+            return(
+              <mesh key={index} geometry={child.geometry} material={materialsbANHxE[index]} >
+
+              <Edges linewidth={1} threshold={15} color={0xfffff} />
+            </mesh>
+            )
+          } 
+        })}
       </group>
     )
   }
 
 };
 export default function TestCar() {
+
   const { scene: scene1New } = useGLTF("BUGATI_V2_F1.glb");
-  // const { scene: scene2 } = useGLTF("buggati_face.glb");
+  const { nodes } = useGLTF("/day58_aluminium_bracket-transformed.glb")
   const matCar = useRef(null)
 
 
@@ -53,25 +66,22 @@ export default function TestCar() {
 
 
   const meshWireCar = scene1New.children[5].geometry
-
+  const [hovered, hover] = useState(false)
 
   //meshWireCar.center()
   meshWireCar.renderOrder = 2
   const maptexture = new TextureLoader().load('/PNG/env_t2.png');///PNG/env_t2.png
   maptexture.mapping = THREE.EquirectangularRefractionMapping;
+
+
   // maptexture.colorSpace = THREE.SRGBColorSpace;
   const matDf = new MeshBasicMaterial({ color: 'red', side: 2 })
-
-  const mapbgtexture = new TextureLoader().load("/PNG/bg_env.png")
-  const textureCube = useCubeTexture(['envx.png', 'env_n.png', 'env_n.png', 'env_n.png', 'env_n.png', 'env_n.png'], { path: '/PNG/' });
-  console.log(textureCube)
-
 
   matCar.current = new MeshStandardMaterial({
     color: 0x00000,
     //flatShading:true,
     envMap: maptexture,
-    envMapIntensity: 5.,
+    envMapIntensity: 2.,
     //envMapRotation: new Euler( 0,-2.0,0, 'XYZ' ),
     //envMapRotation: new Euler( 0,1.0,0, 'XYZ' ),//env_f3_3
     metalness: 1,
@@ -86,11 +96,22 @@ export default function TestCar() {
   return (
     <>
 
+      <group scale={0.42} position={[2, .5, 0]} visible={true}>
+        <mesh
+          geometry={nodes.defaultMaterial.geometry}
+          material={matCar.current}
+        >
+          <Edges linewidth={2} threshold={15} color={0xfffff} />
+          {/*  <Outlines thickness={0.01} color={0xfffff} /> */}
+        </mesh>
+      </group>
 
-      {/*  <directionalLight position={[5, 5, 5]}  intensity={.2} />  */}
       <group scale={0.42} visible={true} name="Carne">
-        <mesh geometry={meshCar} material={matCar.current} />
+        <mesh geometry={meshCar} material={matCar.current} >
+          <Edges linewidth={3} threshold={20} color={0xfffff} />
+          {/*   <Outlines thickness={0.01} opacity={.1} color={0xfffff} />  */}
 
+        </mesh>
       </group>
       <group position={[1.07, .35, 1.08]} scale={[.2 * 0.07, 1 * 0.07, .1 * 0.07]} visible={true}>
         <BanhXe groupBanhXe={ListBanhXe[0]} />
@@ -106,7 +127,7 @@ export default function TestCar() {
     
       </group> */}
 
-     
+
       {/* check env */}
       {/*  <group visible={false}>
         <mesh material={matCar.current}>
@@ -136,8 +157,8 @@ export default function TestCar() {
         </lineSegments>
 
       </group> */}
-    
-   
+
+
 
     </>
   );
@@ -161,7 +182,6 @@ function OutlineCustom(meshRef) {
     />
   )
 }
-
 
 useGLTF.preload("BUGATI_V2_F1.glb");
 useGLTF.preload("buggati_face.glb");

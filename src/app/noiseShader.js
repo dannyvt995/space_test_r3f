@@ -20,7 +20,7 @@ export  const NoiseShader = {
       void main() {
         vec4 color = texture2D(tDiffuse, vUv);
         vec2 seed = vUv + fract( 0.02);
-        color.rgb += random(seed) * amount;
+        color.rgb += random(seed) * 0.02;
       
         gl_FragColor =color;
         //  vec4 noise = vec4(random(seed) * amount);
