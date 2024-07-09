@@ -11,7 +11,7 @@ import {
 	WebGLRenderTarget,
 	HalfFloatType
 } from 'three';
-
+import { fogParsVert, fogVert, fogParsFrag, fogFrag } from './FogReplace';
 class Reflector extends Mesh {
 
 	constructor( geometry, options = {},composer ) {
@@ -49,12 +49,25 @@ class Reflector extends Mesh {
 
 		const textureMatrix = new Matrix4();
 		const virtualCamera = this.camera;
-
+		const params = {
+			fogNearColor: 0xfc4848,
+			fogHorizonColor: 0xe4dcff,
+			fogDensity: 0.00025,
+			fogNoiseSpeed: 100,
+			fogNoiseFreq: 0.0012,
+			fogNoiseImpact: 0.5,
+		  };
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
 		const material = new ShaderMaterial( {
 			name: ( shader.name !== undefined ) ? shader.name : 'unspecified',
-			uniforms: UniformsUtils.clone( shader.uniforms ),
+			uniforms: {
+				...UniformsUtils.clone( shader.uniforms ),
+				fogNearColor: { value: new Color(params.fogNearColor) },
+				fogNoiseFreq: { value: params.fogNoiseFreq },
+				fogNoiseSpeed: { value: params.fogNoiseSpeed },
+				fogNoiseImpact: { value: params.fogNoiseImpact },
+			},
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
 			//wireframe:true
@@ -65,8 +78,9 @@ class Reflector extends Mesh {
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 		material.uniforms[ 'uTime' ].value = 0.;
 
-		this.material = material;
 
+		this.material = material;
+		console.log(this.material)
 		this.onBeforeRender = function ( renderer, scene, camera ) {
 
 			reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
@@ -230,16 +244,21 @@ Reflector.ReflectorShader = {
 		  }
 		  
 		#include <common>
+		
 		#include <logdepthbuf_pars_vertex>
+		//fog
+	
+	
 
 		void main() {
 			vec3 pos = position;
 			pos.z += sin(pos.x *10.+ uTime) * .01 ;
 			pos.z -= cos(pos.y *10.+ uTime) * .01 ;
 			vUv = textureMatrix * vec4( pos, 1.0 );
+			vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
-
+		
 			#include <logdepthbuf_vertex>
 
 		}`,
@@ -252,6 +271,9 @@ Reflector.ReflectorShader = {
 		
 		#include <logdepthbuf_pars_fragment>
 
+		//fog
+
+		
 		float blendOverlay( float base, float blend ) {
 
 			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
@@ -281,11 +303,12 @@ Reflector.ReflectorShader = {
 		
 		
 
-			gl_FragColor = vec4( rlsMinor , 1.0 );
+			vec4 rlscomplete = vec4( rlsMinor , 1.0 );
 			//gl_FragColor = vec4( vec3(.4,.5,1.), 1.0 );
-
+			gl_FragColor = rlscomplete;
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>
+			
 
 		}`
 };

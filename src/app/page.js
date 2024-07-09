@@ -59,7 +59,7 @@ export default function Home() {
         </mesh> */}
 
         <color attach="background" args={["black"]} />{/* 050505 */}
-       {/*  <fog color={"white"} attach="fog" near={1} far={5} /> */}
+        <fog color={"white"} attach="fog" near={1} far={50} />
         {/*  <Environment preset="night" /> */}
        {/*   <axesHelper args={[5, 5, 5]} /> */}
 
